@@ -5,6 +5,7 @@ from .config_writer import ConfigWriter, TestWriter
 from .fields import ConfigField
 from .port import Port
 from .register import Register, RegisterAddress
+from config_writer import UARTWriter
 
 
 class SwitchFeature(Enum):
@@ -25,15 +26,16 @@ class SwitchFeature(Enum):
     PER_VLAN_HEADER_ACTION = "VLAN header action per port and VLAN"
 
 
-RegisterAddressType = TypeVar('RegisterAddressType', bound=RegisterAddress)
-RegisterType = TypeVar('RegisterType', bound=Register)
-CommandType = TypeVar('CommandType')
+RegisterAddressType = TypeVar("RegisterAddressType", bound=RegisterAddress)
+RegisterType = TypeVar("RegisterType", bound=Register)
+CommandType = TypeVar("CommandType")
 
 
 class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
     """
     Representation of a switch chip and its configuration fields and registers.
     """
+
     def __init__(self) -> None:
         self._features: Set[SwitchFeature] = set()
         self._ports: List[Port] = list()
@@ -96,7 +98,9 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         """
         return map(lambda p: p.name, self._ports)
 
-    def get_commands(self, leave_out_default: bool = True, only_touched: bool = False) -> CommandType:
+    def get_commands(
+        self, leave_out_default: bool = True, only_touched: bool = False
+    ) -> CommandType:
         """
         Convert all registers into "commands" for botblox firmware.
         :param leave_out_default: If true, returns only the registers with value different from their default.
@@ -116,7 +120,8 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         """
         :return: Type of the config writer.
         """
-        raise NotImplementedError()
+        return UARTWriter
+        # raise NotImplementedError()
 
     def get_config_writer(self, device_name: str) -> ConfigWriter:
         """
@@ -173,8 +178,9 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         """
         self.fields[field.get_name()] = field
 
-    def _create_port_list_field(self, register: RegisterType, index: int, ports_default: bool, name: str) \
-            -> ConfigField:
+    def _create_port_list_field(
+        self, register: RegisterType, index: int, ports_default: bool, name: str
+    ) -> ConfigField:
         """
         Create a field that represents a bitmask (or other representation) of a set/list of ports.
         :param register: The register that backs this list.
@@ -192,9 +198,15 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         :return: Numeric representation of the VLAN ID.
         :raises ValueError: If the value is not convertible to int or if it is out of the valid VLAN ID range.
         """
-        num = int(vlan_str)  # ValueError can be thrown, but that's expected for non-int inputs
+        num = int(
+            vlan_str
+        )  # ValueError can be thrown, but that's expected for non-int inputs
         if (num < 0) or (num > self.max_vlan_id()):
-            raise ValueError("{} is not valid VLAN ID (max is {})".format(vlan_str, self.max_vlan_id()))
+            raise ValueError(
+                "{} is not valid VLAN ID (max is {})".format(
+                    vlan_str, self.max_vlan_id()
+                )
+            )
         return num
 
     def check_vlan_id(self, vlan_id: int) -> None:
@@ -204,8 +216,11 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         :raise ValueError: If it's invalid.
         """
         if not 0 <= vlan_id < self.max_vlan_id():
-            raise ValueError("VLAN ID {} is invalid for {} with max VLAN ID {}".format(
-                             vlan_id, self.name(), self.max_vlan_id()))
+            raise ValueError(
+                "VLAN ID {} is invalid for {} with max VLAN ID {}".format(
+                    vlan_id, self.name(), self.max_vlan_id()
+                )
+            )
 
     def has_feature(self, feature: SwitchFeature) -> bool:
         """
@@ -222,5 +237,7 @@ class SwitchChip(Generic[RegisterAddressType, RegisterType, CommandType]):
         :raise RuntimeError: If the switch does not have the feature.
         """
         if not self.has_feature(feature):
-            raise RuntimeError("{} does not support {}".format(self.name(), feature.value))
+            raise RuntimeError(
+                "{} does not support {}".format(self.name(), feature.value)
+            )
         pass

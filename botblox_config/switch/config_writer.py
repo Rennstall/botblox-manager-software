@@ -5,7 +5,7 @@ from typing import Any, Generic, List, TypeVar
 import serial
 
 
-CommandType = TypeVar('CommandType')
+CommandType = TypeVar("CommandType")
 
 
 class ConfigWriter(Generic[CommandType]):
@@ -17,7 +17,7 @@ class ConfigWriter(Generic[CommandType]):
         return self.device_description()
 
     @classmethod
-    def device_description(cls: 'ConfigWriter') -> str:
+    def device_description(cls: "ConfigWriter") -> str:
         raise NotImplementedError()
 
     def write(self, data: CommandType) -> bool:
@@ -26,7 +26,7 @@ class ConfigWriter(Generic[CommandType]):
 
 class TestWriter(ConfigWriter[Any]):
     @classmethod
-    def device_description(cls: 'TestWriter') -> str:
+    def device_description(cls: "TestWriter") -> str:
         return "Test"
 
     def write(self, data: CommandType) -> bool:
@@ -42,7 +42,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
         self._device_name = device_name
 
     @classmethod
-    def device_description(cls: 'UARTWriter') -> str:
+    def device_description(cls: "UARTWriter") -> str:
         return "USB-to-UART converter"
 
     def write(self, data: List[Any]) -> bool:
@@ -57,7 +57,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
         """
 
         ser = serial.Serial(
-            port=self._device_name,
+            port="COM4",
             baudrate=115200,
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,
@@ -76,12 +76,12 @@ class UARTWriter(ConfigWriter[List[Any]]):
         try:
             condition = list(condition)[0]
         except IndexError:
-            logging.error('Failed to read condition message from board')
+            logging.error("Failed to read condition message from board")
             return False
         else:
             if condition == 1:
-                logging.info('Success setting configuration in EEPROM')
+                logging.info("Success setting configuration in EEPROM")
                 return True
             elif condition == 2:
-                logging.error('Failed saving configuration in EEPROM')
+                logging.error("Failed saving configuration in EEPROM")
                 return False
