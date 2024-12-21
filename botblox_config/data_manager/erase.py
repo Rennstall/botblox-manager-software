@@ -1,8 +1,8 @@
 from argparse import Action, Namespace
 from typing import (List)
 
-from .switch_config import SwitchConfigCLI
-from ..switch import SwitchChip
+from data_manager.switch_config import SwitchConfigCLI
+from switch import SwitchChip
 
 
 class EraseConfigCLI(SwitchConfigCLI):

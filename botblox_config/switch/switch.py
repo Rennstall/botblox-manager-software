@@ -5,7 +5,7 @@ from .config_writer import ConfigWriter, TestWriter
 from .fields import ConfigField
 from .port import Port
 from .register import Register, RegisterAddress
-from config_writer import UARTWriter
+from .config_writer import UARTWriter
 
 
 class SwitchFeature(Enum):

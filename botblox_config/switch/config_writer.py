@@ -37,7 +37,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
 
     def __init__(self, device_name: str) -> None:
         super().__init__(device_name)
-        if not device_name.startswith("/dev/"):
+        if not device_name.startswith("/dev/") and not device_name.startswith("COM"):
             raise ValueError("Wrong UART communication device " + device_name)
         self._device_name = device_name
 
@@ -57,7 +57,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
         """
 
         ser = serial.Serial(
-            port="COM4",
+            port="COM3",
             baudrate=115200,
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,

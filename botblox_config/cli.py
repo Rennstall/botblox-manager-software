@@ -5,13 +5,13 @@ import logging
 import sys
 from typing import List, Tuple
 
-from .data_manager import (
+from data_manager import (
     EraseConfigCLI,
     PortMirrorConfig,
     TagVlanConfigCLI,
     VlanConfig,
 )
-from .switch import create_switch, SwitchChip
+from switch import create_switch, SwitchChip
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -184,14 +184,10 @@ def cli() -> None:
     logging.debug(data)
     logging.debug('------------------------------------------')
 
-    device_name = args.device
-    if device_name != "test":
-        writer = switch.get_config_writer(device_name)
-        is_success = writer.write(data)
+    writer = args.device
+    is_success = writer.write(data)
 
-        if is_success:
-            logging.info('Successful configuration')
-        else:
-            logging.error('Failed to configure - check logs')
+    if is_success:
+        logging.info('Successful configuration')
     else:
-        logging.info('Test device used, no data were written to any serial port')
+        logging.error('Failed to configure - check logs')

@@ -1,7 +1,7 @@
 from argparse import Action, Namespace
 from typing import List
 
-from ..switch import Port, SwitchChip
+from switch import Port, SwitchChip
 
 
 class SwitchConfig:
