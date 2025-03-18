@@ -168,7 +168,14 @@ def cli() -> None:
 
     args = parser.parse_args()
 
-    config = args.execute(args)
+    if hasattr(args, 'execute'):
+        if callable(args.execute):
+            config = args.execute(args)
+        else:
+            config = args.execute(args)
+    else:
+        parser.error("No command specified")
+
     data: List[List[int]] = config.create_configuration()
 
     logging.debug('Data to be sent (excl. "stop" command): ')
