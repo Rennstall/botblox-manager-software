@@ -45,7 +45,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
     def device_description(cls: "UARTWriter") -> str:
         return "USB-to-UART converter"
 
-    def write(self, data: List[Any]) -> bool:
+    def write(self, data: List[Any], com) -> bool:
         """
         Write data commands to serial port.
 
@@ -57,7 +57,7 @@ class UARTWriter(ConfigWriter[List[Any]]):
         """
 
         ser = serial.Serial(
-            port="COM3",
+            port=com,
             baudrate=115200,
             bytesize=serial.EIGHTBITS,
             parity=serial.PARITY_NONE,

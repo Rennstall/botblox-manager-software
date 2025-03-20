@@ -192,7 +192,8 @@ def cli() -> None:
     logging.debug('------------------------------------------')
 
     writer = args.device
-    is_success = writer.write(data)
+    com_conn = args.device._device_name
+    is_success = writer.write(data, com_conn)
 
     if is_success:
         logging.info('Successful configuration')
