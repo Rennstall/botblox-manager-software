@@ -154,6 +154,30 @@ class IP175G(SwitchChip[MIIRegisterAddress, MIIRegister, List[List[int]]]):
         return [register.address.phy, register.address.mii] + register.as_bytes()
 
     def get_commands(self, leave_out_default: bool = True, only_touched: bool = False) -> List[List[int]]:
+        """
+        Create list of commands to be sent to the BotBlox firmware.
+
+        Explicitly checks if VLANs have been configured and sets the VLAN_VALID register accordingly.
+        For each configured VLAN, one bit is set in the VLAN_VALID register, starting from the LSB.
+        For example:
+            - 1 VLAN: VLAN_VALID = 1 (binary 1)
+            - 2 VLANs: VLAN_VALID = 3 (binary 11)
+            - 3 VLANs: VLAN_VALID = 7 (binary 111)
+
+        :param leave_out_default: If True, registers with default values are omitted from commands
+        :param only_touched: If True, only registers that have been modified are included
+        :return: List of command lists to be sent to the firmware
+        """
+        configured_vlans = 0
+        for i in range(16):
+            vid_field_name = 'VID_{:1X}'.format(i)
+            if vid_field_name in self.fields and self.fields[vid_field_name].is_touched():
+                configured_vlans += 1
+        
+        if configured_vlans > 0 and 'VLAN_VALID' in self.fields:
+            vlan_valid_value = (1 << configured_vlans) - 1
+            self.fields['VLAN_VALID'].set_value(vlan_valid_value)
+
         result = list()
         for r in self._registers.values():
             cmd = self.register_to_command(r, leave_out_default)
